@@ -1,6 +1,10 @@
 {
   "name": "rwm_p2_2025_jordan_lewisphelan",
   "version": "1.0.0",
+  "workspaces": [
+    "packages/*",
+    "temp/demo"
+  ],
   "description": "",
   "main": "index.js",
   "scripts": {
