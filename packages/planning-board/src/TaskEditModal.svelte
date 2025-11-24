@@ -33,6 +33,8 @@
       } else {
         subTask.status = 'To-Do';
       }
+      // Unmark as ready when subtask status changes
+      editedTask.isReady = false;
       editedTask = editedTask; // Trigger reactivity
     }
   }
@@ -50,12 +52,25 @@
     };
 
     editedTask.subTasks = [...editedTask.subTasks, newSubTask];
+    // Unmark as ready when new subtask is added
+    editedTask.isReady = false;
     newSubTaskTitle = '';
   }
 
   // Delete subtask
   function deleteSubTask(subTaskId: number) {
     editedTask.subTasks = editedTask.subTasks.filter(st => st.id !== subTaskId);
+    // Unmark as ready when subtask is deleted
+    editedTask.isReady = false;
+  }
+
+  // Toggle ready state
+  function toggleReady() {
+    editedTask.isReady = !editedTask.isReady;
+    if (editedTask.isReady) {
+      editedTask.markedReadyAt = Date.now();
+    }
+    editedTask = editedTask; // Trigger reactivity
   }
 
   // Save changes and close
@@ -186,6 +201,19 @@
 
       <!-- Modal Footer -->
       <div class="modal-footer">
+        <button 
+          class="ready-btn"
+          class:is-ready={editedTask.isReady}
+          on:click={toggleReady}
+          title={editedTask.isReady ? 'Mark as not ready' : 'Mark as ready for use'}
+        >
+          {#if editedTask.isReady}
+            ✓ Ready
+          {:else}
+            Mark as Ready
+          {/if}
+        </button>
+        <div class="spacer"></div>
         <button class="cancel-btn" on:click={closeModal}>Cancel</button>
         <button class="save-btn" on:click={saveAndClose}>Save Changes</button>
       </div>
@@ -445,7 +473,36 @@
     border-top: 2px solid #e5e7eb;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 0.75rem;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  .ready-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #10b981;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    background: white;
+    color: #10b981;
+  }
+
+  .ready-btn:hover {
+    background: #f0fdf4;
+  }
+
+  .ready-btn.is-ready {
+    background: #10b981;
+    color: white;
+  }
+
+  .ready-btn.is-ready:hover {
+    background: #059669;
   }
 
   .cancel-btn,

@@ -20,6 +20,8 @@ export interface TaskData {
   status: string; // "Not Started" | "In Progress" | "Completed"
   notes: string;
   subTasks: SubTask[];
+  isReady: boolean;
+  markedReadyAt?: number;
   
   // Planning Board: Position & Canvas Data (optional)
   planningPosition?: {
