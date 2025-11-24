@@ -1,7 +1,6 @@
 <script lang="ts">
-  // TODO: Update import path to '../../../packages/planning-board/src' when demo is moved to root
-  import { PlanningBoard } from '../../../../packages/planning-board/src';
-  import { mockTasks } from '../../../../packages/planning-board/src/mockData';
+  import { PlanningBoard } from '../../../packages/planning-board/src';
+  import { mockTasks } from '../../../packages/planning-board/src/mockData';
   
   let tasks = mockTasks;
   

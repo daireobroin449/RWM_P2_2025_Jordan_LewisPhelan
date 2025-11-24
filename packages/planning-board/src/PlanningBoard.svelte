@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { TaskData, PlanningBoardConfig, CanvasState } from './types';
+  import TaskEditModal from './TaskEditModal.svelte';
 
   // Props
   export let tasks: TaskData[] = [];
@@ -40,6 +41,10 @@
 
   // SVG element reference
   let svgElement: SVGSVGElement;
+
+  // Modal state
+  let isModalOpen = false;
+  let selectedTaskForEdit: TaskData | null = null;
 
   // Task box dimensions
   const TASK_WIDTH = 200;
@@ -136,10 +141,26 @@
     canvasState.selectedItemType = 'task';
   }
 
-  // Double click to edit task (placeholder for Phase 2)
+  // Double click to edit task
   function handleTaskDoubleClick(taskId: number) {
-    console.log('Double-clicked task:', taskId);
-    // Phase 2: Open edit modal
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      selectedTaskForEdit = task;
+      isModalOpen = true;
+    }
+  }
+
+  // Handle modal close
+  function handleModalClose() {
+    isModalOpen = false;
+    selectedTaskForEdit = null;
+  }
+
+  // Handle task update from modal
+  function handleTaskUpdate(event: CustomEvent<{ task: TaskData }>) {
+    const updatedTask = event.detail.task;
+    tasks = tasks.map(t => t.id === updatedTask.id ? updatedTask : t);
+    dispatch('update', { tasks });
   }
 
   // Calculate viewBox for zoom and pan
@@ -270,9 +291,19 @@
       <li>🖱️ Middle mouse + drag: Pan canvas</li>
       <li>🔍 Mouse wheel: Zoom in/out</li>
       <li>👆 Left click + drag: Move task</li>
-      <li>👆👆 Double click: Edit task (Coming in Phase 2)</li>
+      <li>👆👆 Double click: Edit task & subtasks</li>
     </ul>
   </div>
+
+  <!-- Task Edit Modal -->
+  {#if isModalOpen && selectedTaskForEdit}
+    <TaskEditModal 
+      task={selectedTaskForEdit}
+      isOpen={isModalOpen}
+      on:close={handleModalClose}
+      on:update={handleTaskUpdate}
+    />
+  {/if}
 </div>
 
 <style>
