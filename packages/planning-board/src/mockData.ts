@@ -13,11 +13,12 @@ export const mockTasks: TaskData[] = [
     status: 'In Progress',
     notes: 'Main video production project',
     subTasks: [
-      { id: 101, title: 'Presentation', status: 'Done' },
-      { id: 102, title: 'Rough Videos', status: 'In Progress' },
-      { id: 103, title: 'Final Videos', status: 'To-Do' }
+      { id: 101, title: 'Presentation', status: 'Done', addedAfterPlanning: false },
+      { id: 102, title: 'Rough Videos', status: 'In Progress', addedAfterPlanning: false },
+      { id: 103, title: 'Final Videos', status: 'To-Do', addedAfterPlanning: false }
     ],
-    planningPosition: { x: 100, y: 100 }
+    planningPosition: { x: 100, y: 100 },
+    isReady: false
   },
   {
     id: 2,
@@ -28,11 +29,12 @@ export const mockTasks: TaskData[] = [
     status: 'Not Started',
     notes: 'Create unified design language',
     subTasks: [
-      { id: 201, title: 'Color Palette', status: 'To-Do' },
-      { id: 202, title: 'Typography', status: 'To-Do' },
-      { id: 203, title: 'Component Library', status: 'To-Do' }
+      { id: 201, title: 'Color Palette', status: 'To-Do', addedAfterPlanning: false },
+      { id: 202, title: 'Typography', status: 'To-Do', addedAfterPlanning: false },
+      { id: 203, title: 'Component Library', status: 'To-Do', addedAfterPlanning: false }
     ],
-    planningPosition: { x: 350, y: 100 }
+    planningPosition: { x: 350, y: 100 },
+    isReady: false
   },
   {
     id: 3,
@@ -43,10 +45,11 @@ export const mockTasks: TaskData[] = [
     status: 'In Progress',
     notes: 'Character and environment assets',
     subTasks: [
-      { id: 301, title: 'Character Models', status: 'In Progress' },
-      { id: 302, title: 'Environment Props', status: 'To-Do' }
+      { id: 301, title: 'Character Models', status: 'In Progress', addedAfterPlanning: false },
+      { id: 302, title: 'Environment Props', status: 'To-Do', addedAfterPlanning: false }
     ],
-    planningPosition: { x: 600, y: 100 }
+    planningPosition: { x: 600, y: 100 },
+    isReady: false
   },
   {
     id: 4,
@@ -57,11 +60,12 @@ export const mockTasks: TaskData[] = [
     status: 'Not Started',
     notes: 'RESTful API development',
     subTasks: [
-      { id: 401, title: 'Database Schema', status: 'To-Do' },
-      { id: 402, title: 'Authentication', status: 'To-Do' },
-      { id: 403, title: 'Endpoints', status: 'To-Do' }
+      { id: 401, title: 'Database Schema', status: 'To-Do', addedAfterPlanning: false },
+      { id: 402, title: 'Authentication', status: 'To-Do', addedAfterPlanning: false },
+      { id: 403, title: 'Endpoints', status: 'To-Do', addedAfterPlanning: false }
     ],
-    planningPosition: { x: 100, y: 300 }
+    planningPosition: { x: 100, y: 300 },
+    isReady: false
   },
   {
     id: 5,
@@ -72,11 +76,12 @@ export const mockTasks: TaskData[] = [
     status: 'Not Started',
     notes: 'Comprehensive testing coverage',
     subTasks: [
-      { id: 501, title: 'Unit Tests', status: 'To-Do' },
-      { id: 502, title: 'Integration Tests', status: 'To-Do' },
-      { id: 503, title: 'E2E Tests', status: 'To-Do' }
+      { id: 501, title: 'Unit Tests', status: 'To-Do', addedAfterPlanning: false },
+      { id: 502, title: 'Integration Tests', status: 'To-Do', addedAfterPlanning: false },
+      { id: 503, title: 'E2E Tests', status: 'To-Do', addedAfterPlanning: false }
     ],
-    planningPosition: { x: 350, y: 300 }
+    planningPosition: { x: 350, y: 300 },
+    isReady: false
   },
   {
     id: 6,
@@ -87,7 +92,8 @@ export const mockTasks: TaskData[] = [
     status: 'Not Started',
     notes: 'User and developer documentation',
     subTasks: [],
-    planningPosition: { x: 600, y: 300 }
+    planningPosition: { x: 600, y: 300 },
+    isReady: false
   }
 ];
 
