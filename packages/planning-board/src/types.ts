@@ -47,6 +47,7 @@ export interface Shape {
   size: { width: number; height: number };
   color: string;
   label: string;
+  description?: string;
   // Track tasks contained in this shape
   containedTaskIds: number[];
 }

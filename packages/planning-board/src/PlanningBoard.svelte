@@ -45,6 +45,14 @@
   // Shape editing
   let editingShapeId: string | null = null;
   let editingShapeLabel: string = '';
+  let editingShapeDescription: string = ''
+  let forceShapeModalUpdate = 0; // Force reactivity trigger
+
+  // Reactive statement to debug modal rendering
+  $: {
+    console.log('Reactive: editingShapeId changed to:', editingShapeId);
+    console.log('Reactive: forceShapeModalUpdate is:', forceShapeModalUpdate);
+  }
 
   // Arrow editing
   let editingArrowId: string | null = null;
@@ -215,29 +223,38 @@
 
   // Double-click shape to edit label
   function handleShapeDoubleClick(shapeId: string) {
-    console.log('Shape double-clicked:', shapeId); // Debug log
+    editingShapeId = shapeId;
     const shape = shapes.find(s => s.id === shapeId);
+    
     if (shape) {
       editingShapeId = shapeId;
       editingShapeLabel = shape.label;
+      editingShapeDescription = shape.description || '';
+      forceShapeModalUpdate++; // Force Svelte to detect change
+    } else {
+      console.log('Shape not found!');
     }
   }
 
   // Save shape label edit
   function saveShapeLabel() {
+    console.log('Saving shape label');
     if (editingShapeId) {
       const shape = shapes.find(s => s.id === editingShapeId);
       if (shape) {
         shape.label = editingShapeLabel;
+        shape.description = editingShapeDescription;
         shapes = shapes; // Trigger reactivity
       }
     }
     editingShapeId = null;
     editingShapeLabel = '';
+    editingShapeDescription = '';
   }
 
   // Cancel shape label edit
   function cancelShapeEdit() {
+    console.log('Canceling shape edit');
     editingShapeId = null;
     editingShapeLabel = '';
   }
@@ -285,6 +302,7 @@
       },
       color: '#9333ea',
       label: `${type.charAt(0).toUpperCase() + type.slice(1)} ${nextShapeId - 1}`,
+      description: '',
       containedTaskIds: []
     };
     shapes = [...shapes, newShape];
@@ -556,6 +574,7 @@
 </script>
 
 <div class="planning-board-container" on:keydown={handleKeyPress}>
+
   <!-- Toolbar -->
   <div class="toolbar">
     <div class="toolbar-section">
@@ -855,6 +874,21 @@
             class:is-ready={task.isReady}
             class:old-idea-connected={isOldIdea}
             transform="translate({task.planningPosition.x}, {task.planningPosition.y})"
+            on:mousedown={(e) => startDragTask(e, task.id)}
+            on:click={(e) => {
+              e.stopPropagation();
+              if (activeTool === 'arrow') {
+                handleItemClickForArrow(task.id, 'task');
+              } else {
+                selectTask(task.id);
+              }
+            }}
+            on:dblclick={(e) => {
+              e.stopPropagation();
+              if (!hasMovedSinceMouseDown) {
+                handleTaskDoubleClick(task.id);
+              }
+            }}
           >
             <!-- Task background -->
             <rect
@@ -865,21 +899,6 @@
               stroke-width="3"
               rx="8"
               class="task-bg"
-              on:mousedown={(e) => startDragTask(e, task.id)}
-              on:click={(e) => {
-                e.stopPropagation();
-                if (activeTool === 'arrow') {
-                  handleItemClickForArrow(task.id, 'task');
-                } else {
-                  selectTask(task.id);
-                }
-              }}
-              on:dblclick={(e) => {
-                e.stopPropagation();
-                if (!hasMovedSinceMouseDown) {
-                  handleTaskDoubleClick(task.id);
-                }
-              }}
             />
 
             <!-- Old idea indicator -->
@@ -1010,26 +1029,105 @@
   </div>
 
   <!-- Instructions -->
-  <div class="instructions">
+   <div class="instructions">
     <p><strong>Controls:</strong></p>
     <ul>
       <li>🖱️ Middle mouse + drag: Pan canvas</li>
       <li>🔍 Mouse wheel: Zoom in/out</li>
-      <li>👆 Left click + drag: Move task</li>
-      <li>👆👆 Double click: Edit task & subtasks</li>
+      <li>👆 Left click + drag: Move task/shape</li>
+      <li>👆👆 Double click task: Edit subtasks</li>
+      <li>👆👆 Double click shape: Edit label</li>
+      <li>👆👆 Double click arrow: Mark as old idea</li>
+      <li>⌨️ Delete/Backspace: Remove selected item</li>
     </ul>
   </div>
-
-  <!-- Task Edit Modal -->
-  {#if isModalOpen && selectedTaskForEdit}
-    <TaskEditModal 
-      task={selectedTaskForEdit}
-      isOpen={isModalOpen}
-      on:close={handleModalClose}
-      on:update={handleTaskUpdate}
-    />
-  {/if}
 </div>
+
+<!-- Modals (outside main container) -->
+
+<!-- Task Edit Modal -->
+{#if isModalOpen && selectedTaskForEdit}
+  <TaskEditModal 
+    task={selectedTaskForEdit}
+    isOpen={isModalOpen}
+    on:close={handleModalClose}
+    on:update={handleTaskUpdate}
+  />
+{/if}
+
+<!-- Shape Edit Modal -->
+{#if editingShapeId !== null}
+  <div class="modal-overlay" on:click={cancelShapeEdit} role="button" tabindex="0">
+    <div class="modal small" on:click|stopPropagation role="dialog">
+      <div class="modal-header">
+        <h3>Edit Shape Label</h3>
+        <button class="close-btn" on:click={cancelShapeEdit}>✕</button>
+      </div>
+      
+   <div class="modal-body">
+  <div class="form-group">
+    <label>Label</label>
+    <input 
+      type="text" 
+      bind:value={editingShapeLabel}
+      placeholder="Shape title..."
+      autofocus
+    />
+  </div>
+  
+  <div class="form-group">
+    <label>Description</label>
+    <textarea 
+      bind:value={editingShapeDescription}
+      placeholder="What is this shape for? Add notes here..."
+      rows="4"
+    ></textarea>
+  </div>
+</div>
+
+      <div class="modal-footer">
+        <button class="cancel-btn" on:click={cancelShapeEdit}>Cancel</button>
+        <button class="save-btn" on:click={saveShapeLabel}>Save</button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- Arrow Edit Modal -->
+{#if editingArrowId !== null}
+  {@const arrow = arrows.find(a => a.id === editingArrowId)}
+  {#if arrow}
+    <div class="modal-overlay" on:click={() => editingArrowId = null} role="button" tabindex="0">
+      <div class="modal small" on:click|stopPropagation role="dialog">
+        <div class="modal-header">
+          <h3>Edit Arrow</h3>
+          <button class="close-btn" on:click={() => editingArrowId = null}>✕</button>
+        </div>
+        
+        <div class="modal-body">
+          <p style="margin-bottom: 1rem; color: #6b7280;">
+            Mark this connection as an old/deprecated approach. Tasks connected by old arrows will be highlighted in red.
+          </p>
+          <button 
+            class="toggle-old-btn"
+            class:is-old={arrow.isOldIdea}
+            on:click={() => toggleArrowOldIdea(arrow.id)}
+          >
+            {#if arrow.isOldIdea}
+              ✓ Marked as Old Idea
+            {:else}
+              Mark as Old Idea
+            {/if}
+          </button>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel-btn" on:click={() => editingArrowId = null}>Close</button>
+        </div>
+      </div>
+    </div>
+  {/if}
+{/if}
 
 <style>
   .planning-board-container {
