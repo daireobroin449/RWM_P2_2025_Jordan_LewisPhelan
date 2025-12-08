@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/daireobroin449/RWM_P2_2025_Jordan_LewisPhelan/issues"
   },
-  "homepage": "https://github.com/daireobroin449/RWM_P2_2025_Jordan_LewisPhelan#readme"
+  "homepage": "https://github.com/daireobroin449/RWM_P2_2025_Jordan_LewisPhelan#readme",
+  "devDependencies": {
+    "vite": "^7.2.7"
+  }
 }
